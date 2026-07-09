@@ -42,7 +42,7 @@ A modern, high-performance personal portfolio website built with **Next.js 16**,
 
 ```bash
 # Clone the repository
-git clone https://github.com/<your-username>/portfolio.git
+git clone https://github.com/RiteshKrChauhan/portfolio.git
 
 # Navigate into the project
 cd portfolio

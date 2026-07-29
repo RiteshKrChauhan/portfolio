@@ -6,7 +6,7 @@ export interface Achievement {
 }
 
 export const achievements: Achievement[] = [
-  { id: "projects", title: "Projects Built", value: "8", suffix: "+" },
+  { id: "projects", title: "Projects Built", value: "10", suffix: "+" },
   { id: "technologies", title: "Technologies", value: "30", suffix: "+" },
   { id: "cgpa", title: "CGPA", value: "9.6", suffix: "/10" },
 ];

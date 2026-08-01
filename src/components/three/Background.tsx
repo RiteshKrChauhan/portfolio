@@ -144,7 +144,7 @@ function AccretionDisk() {
             float t = (r - innerR) / (outerR - innerR);
 
             // Use real angular position + time-driven differential rotation
-            float angularSpeed = 0.6 - t * 0.45;
+            float angularSpeed = 0.3 - t * 0.22;
             float swirl = vAngle + uTime * angularSpeed - r * 0.9;
 
             // Turbulent noise layers

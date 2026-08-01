@@ -142,3 +142,22 @@ body {
   background-size: 200% 100%;
   animation: shimmer 4s ease-in-out infinite;
 }
+
+/* Explore card border split animation */
+@keyframes arcSweepRight {
+  from { stroke-dashoffset: var(--arc-start); }
+  to   { stroke-dashoffset: var(--arc-end); }
+}
+@keyframes arcSweepLeft {
+  from { stroke-dashoffset: var(--arc-start); }
+  to   { stroke-dashoffset: var(--arc-end); }
+}
+@keyframes mergeFlash {
+  0%   { opacity: 0; }
+  40%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes borderFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}

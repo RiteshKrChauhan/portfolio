@@ -21,13 +21,6 @@ export function createLenis() {
     infinite: false,
   });
 
-  function raf(time: number) {
-    lenis.raf(time);
-    requestAnimationFrame(raf);
-  }
-
-  requestAnimationFrame(raf);
-
   lenis.on("scroll", ScrollTrigger.update);
 
   gsap.ticker.add((time) => {

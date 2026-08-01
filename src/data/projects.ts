@@ -26,6 +26,18 @@ export const projects: Project[] = [
     architecture: ["Multi-Agent", "LLM Pipeline", "REST API"],
   },
   {
+    id: "autonomous-self-healing-ml-system",
+    title: "Autonomous Self Healing ML System",
+    description: "Real-time predictive-maintenance ML pipeline that detects drift and anomalies, then autonomously retrains and promotes better models.",
+    longDescription: "Built a production-grade, real-time machine learning pipeline for predictive maintenance of turbofan aircraft engines using the NASA CMAPSS FD001 dataset. The system predicts Remaining Useful Life with a Random Forest regressor, continuously monitors live sensor streams for concept drift with ADWIN, feature drift with KS-tests, and anomalies with Isolation Forest. When degradation is confirmed, it triggers background retraining, validates candidate models through shadow A/B evaluation, and promotes improved models without operator intervention.",
+    tech: ["Python", "FastAPI", "React", "Scikit-Learn", "River", "SciPy", "NumPy", "Pandas"],
+    image: "/images/projects/autonomous-self-healing-ml-system.jpg",
+    live: "https://github.com/RiteshKrChauhan/AUTONOMOUS-SELF-HEALING-ML-SYSTEM",
+    featured: true,
+    category: "ml",
+    architecture: ["Self-Healing ML", "Drift Detection", "Shadow A/B Evaluation", "Predictive Maintenance"],
+  },
+  {
     id: "network-intrusion-detection",
     title: "Network Intrusion Detection",
     description: "Full-stack IDS dashboard processing 2.8M+ CICIDS-2017 records with 99.86% intrusion-detection accuracy.",

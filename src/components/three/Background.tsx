@@ -14,6 +14,7 @@ if (typeof window !== "undefined") {
   };
 }
 
+const FIXED_STEP = 1 / 60;
 
 /* ─── Starfield ─────────────────────────────────────────────── */
 function Stars() {
@@ -39,8 +40,8 @@ function Stars() {
 
   const mat = useRef<THREE.ShaderMaterial>(null);
   const elapsed = useRef(0);
-  useFrame((_, delta) => {
-    elapsed.current += delta;
+  useFrame(() => {
+    elapsed.current += FIXED_STEP;
     if (mat.current) mat.current.uniforms.uTime.value = elapsed.current;
   });
 
@@ -84,8 +85,8 @@ function Stars() {
 function AccretionDisk() {
   const mat = useRef<THREE.ShaderMaterial>(null);
   const elapsed = useRef(0);
-  useFrame((_, delta) => {
-    elapsed.current += delta;
+  useFrame(() => {
+    elapsed.current += FIXED_STEP;
     if (mat.current) mat.current.uniforms.uTime.value = elapsed.current;
   });
 
@@ -108,18 +109,18 @@ function AccretionDisk() {
         blending={THREE.AdditiveBlending}
         uniforms={{ uTime: { value: 0 } }}
         vertexShader={`
-          varying vec2 vUv;
           varying float vRadius;
+          varying float vAngle;
           void main() {
-            vUv = uv;
             vRadius = length(position.xy);
+            vAngle = atan(position.y, position.x);
             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
           }
         `}
         fragmentShader={`
           uniform float uTime;
-          varying vec2 vUv;
           varying float vRadius;
+          varying float vAngle;
 
           float hash(vec2 p) {
             return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
@@ -140,11 +141,11 @@ function AccretionDisk() {
             float r = vRadius;
             float innerR = 1.35;
             float outerR = 5.2;
-            float t = (r - innerR) / (outerR - innerR); // 0=inner, 1=outer
+            float t = (r - innerR) / (outerR - innerR);
 
-            // Angular position for swirl
-            float angle = atan(vUv.y - 0.5, vUv.x - 0.5);
-            float swirl = angle + uTime * (0.6 - t * 0.45) - r * 0.9;
+            // Use real angular position + time-driven differential rotation
+            float angularSpeed = 0.6 - t * 0.45;
+            float swirl = vAngle + uTime * angularSpeed - r * 0.9;
 
             // Turbulent noise layers
             float n1 = noise(vec2(swirl * 2.8, r * 1.4 + uTime * 0.12));
@@ -193,8 +194,8 @@ function BlackHole() {
   const { camera } = useThree();
   const elapsed = useRef(0);
 
-  useFrame((_, delta) => {
-    elapsed.current += delta;
+  useFrame(() => {
+    elapsed.current += FIXED_STEP;
     if (mat.current) {
       mat.current.uniforms.uTime.value = elapsed.current;
       mat.current.uniforms.uCamPos.value.copy(camera.position);
@@ -272,8 +273,8 @@ function EventHorizon() {
 function OuterGlow() {
   const mat = useRef<THREE.ShaderMaterial>(null);
   const elapsed = useRef(0);
-  useFrame((_, delta) => {
-    elapsed.current += delta;
+  useFrame(() => {
+    elapsed.current += FIXED_STEP;
     if (mat.current) mat.current.uniforms.uTime.value = elapsed.current;
   });
 

@@ -2,26 +2,37 @@
 
 import { useRef } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { MapPin, GraduationCap, Download } from "lucide-react";
+import { MapPin, GraduationCap } from "lucide-react";
 import { AnimatedSection } from "@/components/ui/AnimatedSection";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { achievements, siteConfig } from "@/data";
 import { useReducedMotion } from "@/hooks";
-import { MagneticButton } from "@/components/ui/MagneticButton";
 
-function AnimatedStat({ value, suffix, title, delay }: {
-  value: string; suffix?: string; title: string; delay: number;
+function AnimatedStat({ value, suffix, title, delay, href }: {
+  value: string; suffix?: string; title: string; delay: number; href?: string;
 }) {
+  const content = (
+    <>
+      <div className="text-2xl font-bold text-gradient-space">{value}{suffix ?? ""}</div>
+      <div className="text-xs text-zinc-500 mt-0.5">{title}</div>
+    </>
+  );
+
   return (
     <motion.div
-      className="glass rounded-2xl p-4 glass-hover group"
+      className="glass rounded-2xl glass-hover group"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: false }}
       transition={{ delay, duration: 0.5 }}
     >
-      <div className="text-2xl font-bold text-gradient-space">{value}{suffix ?? ""}</div>
-      <div className="text-xs text-zinc-500 mt-0.5">{title}</div>
+      {href ? (
+        <a href={href} target="_blank" rel="noopener noreferrer" className="block p-4">
+          {content}
+        </a>
+      ) : (
+        <div className="p-4">{content}</div>
+      )}
     </motion.div>
   );
 }
@@ -113,23 +124,12 @@ export function About() {
                   {siteConfig.location}
                 </span>
               </div>
-
-              <MagneticButton strength={0.2}>
-                <a
-                  href={siteConfig.resumeUrl}
-                  download
-                  className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-xs font-medium text-zinc-300 border border-white/[0.1] hover:border-sky-500/30 hover:text-white hover:bg-sky-500/[0.05] transition-all duration-300"
-                >
-                  <Download className="w-3 h-3" />
-                  Download Resume
-                </a>
-              </MagneticButton>
             </motion.div>
 
             {/* Stat cards — 3 columns */}
             <div className="grid grid-cols-3 gap-3">
               {achievements.map((a, i) => (
-                <AnimatedStat key={a.id} value={a.value} suffix={a.suffix} title={a.title} delay={0.4 + i * 0.1} />
+                <AnimatedStat key={a.id} value={a.value} suffix={a.suffix} title={a.title} href={a.href} delay={0.4 + i * 0.1} />
               ))}
             </div>
           </div>

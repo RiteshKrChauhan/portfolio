@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
-import { GitBranch, X, ArrowUpRight } from "lucide-react";
+import { GitBranch, X, ArrowUpRight, GitFork } from "lucide-react";
 import { getLenis } from "@/lib/smooth-scroll";
 import { AnimatedSection } from "@/components/ui/AnimatedSection";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -76,30 +76,19 @@ function RoadmapItem({ project, index, onOpen }: { project: Project; index: numb
   const isLeft = index % 2 === 0;
   const itemRef = useRef<HTMLDivElement>(null);
 
-  // "start 62%" → progress=0 when card TOP reaches 62vh (= star head arrives at card)
-  // "center 25%" → progress=1 when card center reaches 25vh (star well past)
   const { scrollYProgress: itemProgress } = useScroll({
     target: itemRef,
     offset: ["start 62%", "center 25%"],
   });
 
-  // Appear almost instantly when head arrives, stay, then fade as head moves far away
   const lineOpacity = useTransform(itemProgress, [0, 0.01, 0.55, 1], [0, 1, 1, 0]);
 
   return (
     <div ref={itemRef} className="relative md:grid md:min-h-[292px] md:grid-cols-[minmax(0,1fr)_72px_minmax(0,1fr)] md:items-center">
-      {/* Project card */}
       <div className={`pl-12 md:pl-0 ${isLeft ? "md:col-start-1 md:pr-7" : "md:col-start-3 md:pl-7"}`}>
         <ProjectCard project={project} index={index} onOpen={onOpen} />
       </div>
 
-      {/*
-        Desktop connector — absolutely positioned to precisely bridge the gap.
-        Width = 36px (half of 72px center col) + 28px (card pr-7/pl-7 padding) = 64px.
-        Left card:  left edge = calc(50% - 64px) [card content right edge], right edge = 50% [spine]
-        Right card: left edge = 50% [spine], right edge = calc(50% + 64px) [card content left edge]
-        Bright at card side, transparent at spine side (merges into trail seamlessly).
-      */}
       <motion.div
         className="hidden md:block absolute pointer-events-none"
         style={{
@@ -121,7 +110,6 @@ function RoadmapItem({ project, index, onOpen }: { project: Project; index: numb
         }}
       />
 
-      {/* Mobile connector: spine at left≈16px, card content at pl-12=48px */}
       <motion.div
         className="md:hidden absolute pointer-events-none"
         style={{
@@ -138,8 +126,64 @@ function RoadmapItem({ project, index, onOpen }: { project: Project; index: numb
   );
 }
 
+function ExploreMoreCard({ onVisible }: { onVisible: (visible: boolean) => void }) {
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const [lit, setLit] = useState(false);
 
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const threshold = window.innerHeight * 0.62;
+    const check = () => {
+      const top = el.getBoundingClientRect().top;
+      const reached = top <= threshold;
+      setLit(reached);
+      onVisible(reached);
+    };
+    window.addEventListener("scroll", check, { passive: true });
+    check();
+    return () => window.removeEventListener("scroll", check);
+  }, [onVisible]);
 
+  return (
+    <div className="flex justify-center pl-12 md:pl-0 pb-8 mt-32">
+      <div className="relative w-full max-w-md">
+        {/* sentinel at exact card top edge */}
+        <div ref={sentinelRef} className="absolute top-0 left-0 w-full h-px pointer-events-none" />
+        <a
+          href="https://github.com/RiteshKrChauhan"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group relative flex items-center justify-between gap-6 rounded-3xl px-8 py-7 overflow-hidden glass cursor-pointer w-full transition-all duration-700"
+          style={{
+            border: lit ? "1px solid rgba(125,211,252,0.45)" : "1px solid rgba(255,255,255,0.06)",
+            boxShadow: lit ? "0 0 24px rgba(125,211,252,0.2), 0 0 48px rgba(125,211,252,0.08)" : "none",
+          }}
+        >
+          {lit && (
+            <div
+              className="pointer-events-none absolute inset-0 rounded-3xl"
+              style={{ background: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(125,211,252,0.12) 0%, transparent 70%)" }}
+            />
+          )}
+          <div className="relative z-10">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-sky-400 mb-1">More work</p>
+            <h3 className="text-xl font-semibold text-zinc-100 group-hover:text-sky-300 transition-colors">Explore all my projects</h3>
+            <p className="text-sm text-zinc-500 mt-1">See everything I&apos;ve built on GitHub →</p>
+          </div>
+          <div className="relative z-10 flex-shrink-0">
+            <div
+              className="w-12 h-12 rounded-full flex items-center justify-center bg-white/[0.04] border border-white/[0.08] group-hover:bg-sky-500/10 group-hover:border-sky-500/30 transition-all duration-300"
+              style={lit ? { filter: "drop-shadow(0 0 8px rgba(125,211,252,0.7))" } : {}}
+            >
+              <GitFork className="w-5 h-5 text-zinc-400 group-hover:text-sky-400 transition-colors" />
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  );
+}
 
 function ProjectModal({ project, onClose }: { project: Project; onClose: () => void }) {
   useEffect(() => {
@@ -218,8 +262,6 @@ export function Projects() {
   const roadmapProjects = [...featuredProjects, ...otherProjects];
   const { scrollYProgress } = useScroll({
     target: roadmapRef,
-    // "start 95%" = section top enters at 95% from viewport top (just barely scrolled into view)
-    // "end 20%"   = section bottom reaches 20% from viewport top (almost scrolled past)
     offset: ["start 95%", "end 20%"],
   });
   const smoothProgress = useSpring(scrollYProgress, {
@@ -229,17 +271,12 @@ export function Projects() {
     restDelta: 0.001,
   });
 
-  // Spine line opacity
+  const [starHidden, setStarHidden] = useState(false);
+
   const spineOpacity = useTransform(smoothProgress, [0, 1], [0.18, 0.45]);
-
-  // Star fades in almost immediately, fades out near the end
-  const starOpacity = useTransform(smoothProgress, [0, 0.02, 0.88, 1], [0, 1, 1, 0]);
-
-  // Trail grows upward from the head
-  const trailScaleY = useTransform(smoothProgress, [0, 0.03, 0.35, 0.88, 1], [0, 0.04, 1, 1, 0.3]);
-  const trailOpacity = useTransform(smoothProgress, [0, 0.03, 0.2, 0.88, 1], [0, 0, 1, 1, 0]);
-
-  // Head glow — white-blueish to match site theme
+  const starOpacity = useTransform(smoothProgress, [0, 0.02], [0, 1]);
+  const trailScaleY = useTransform(smoothProgress, [0, 0.03, 0.35], [0, 0.04, 1]);
+  const trailOpacity = useTransform(smoothProgress, [0, 0.03, 0.2], [0, 0, 1]);
   const headGlow = useTransform(
     smoothProgress,
     [0, 0.5, 1],
@@ -259,13 +296,11 @@ export function Projects() {
             ref={roadmapRef}
             className="relative"
             style={{
-              // Soft fade at top and bottom instead of hard clip
               maskImage: "linear-gradient(to bottom, transparent 0%, black 6%, black 94%, transparent 100%)",
               WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 6%, black 94%, transparent 100%)",
             }}
           >
-
-            {/* Static spine line behind the star */}
+            {/* Static spine line */}
             <div className="pointer-events-none absolute inset-x-0 bottom-8 top-0 overflow-hidden">
               <motion.div
                 className="absolute bottom-0 left-4 top-0 w-px -translate-x-1/2 md:left-1/2"
@@ -277,15 +312,12 @@ export function Projects() {
               />
             </div>
 
-            {/* Shooting star — sticky at 62vh so the head is in the lower half of the screen */}
-            <div className="pointer-events-none sticky top-[62vh] z-10 h-0">
+            {/* Shooting star */}
+            <div className="pointer-events-none sticky top-[62vh] z-10 h-0" style={{ visibility: starHidden ? "hidden" : "visible" }}>
               <motion.div
                 className="absolute left-4 -translate-x-1/2 md:left-1/2"
                 style={{ opacity: starOpacity, filter: headGlow }}
               >
-
-                {/* ── TRAIL: head circle is built into the SVG cap below ── */}
-
                 <motion.div
                   className="absolute"
                   style={{
@@ -303,17 +335,10 @@ export function Projects() {
                     width="60"
                     height="260"
                     viewBox="0 0 60 260"
-                    style={{
-                      position: "absolute",
-                      bottom: 0,
-                      left: "50%",
-                      transform: "translateX(-50%)",
-                      overflow: "visible",
-                    }}
+                    style={{ position: "absolute", bottom: 0, left: "50%", transform: "translateX(-50%)", overflow: "visible" }}
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <defs>
-                      {/* Linear gradients: bright at y=1 (bottom/head), transparent at y=0 (top/tip) */}
                       <linearGradient id="trailCore" x1="0" y1="1" x2="0" y2="0">
                         <stop offset="0%"   stopColor="#ffffff"  stopOpacity="1"    />
                         <stop offset="8%"   stopColor="#ffffff"  stopOpacity="0.95" />
@@ -332,7 +357,6 @@ export function Projects() {
                         <stop offset="55%"  stopColor="#0ea5e9"  stopOpacity="0.05" />
                         <stop offset="100%" stopColor="#0c4a6e"  stopOpacity="0"    />
                       </linearGradient>
-                      {/* Radial gradient for the circular head cap */}
                       <radialGradient id="headCap" cx="50%" cy="50%" r="50%">
                         <stop offset="0%"   stopColor="#ffffff"  stopOpacity="0.95" />
                         <stop offset="35%"  stopColor="#e0f2fe"  stopOpacity="0.7"  />
@@ -349,51 +373,12 @@ export function Projects() {
                         <feGaussianBlur stdDeviation="3" />
                       </filter>
                     </defs>
-
-                    {/*
-                      Paths use arc at the bottom (near head) for a circular cap.
-                      M tip  →  L left-edge,y  →  A rx,ry 0 0,0 right-edge,y  →  Z
-                      The arc sweeps from left to right edge creating a semicircular bottom.
-                    */}
-
-                    {/* Layer 1 – diffuse halo, wide arc bottom */}
-                    <path
-                      d="M 30,0 L 10,248 A 20,12 0 0,0 50,248 Z"
-                      fill="url(#trailHalo)"
-                      filter="url(#trailBlur)"
-                    />
-                    {/* Layer 2 – glow body, medium arc bottom */}
-                    <path
-                      d="M 30,0 L 20,252 A 10,7 0 0,0 40,252 Z"
-                      fill="url(#trailGlow)"
-                      filter="url(#trailBlurSm)"
-                    />
-                    {/* Layer 3 – bright core with small arc bottom */}
-                    <path
-                      d="M 30,0 L 28.2,256 A 1.8,2 0 0,0 31.8,256 Z"
-                      fill="url(#trailCore)"
-                    />
-                    {/* Layer 4 – razor centre line */}
-                    <line
-                      x1="30" y1="4"
-                      x2="30" y2="258"
-                      stroke="#ffffff"
-                      strokeWidth="0.6"
-                      strokeLinecap="round"
-                      opacity="0.55"
-                    />
-                    {/* Circular glowing cap at head — blends trail into the orb */}
-                    <circle
-                      cx="30" cy="256" r="10"
-                      fill="url(#headCap)"
-                      filter="url(#headCapBlur)"
-                    />
-                    {/* Inner bright circle core */}
-                    <circle
-                      cx="30" cy="256" r="3"
-                      fill="#ffffff"
-                      opacity="0.9"
-                    />
+                    <path d="M 30,0 L 10,248 A 20,12 0 0,0 50,248 Z" fill="url(#trailHalo)" filter="url(#trailBlur)" />
+                    <path d="M 30,0 L 20,252 A 10,7 0 0,0 40,252 Z" fill="url(#trailGlow)" filter="url(#trailBlurSm)" />
+                    <path d="M 30,0 L 28.2,256 A 1.8,2 0 0,0 31.8,256 Z" fill="url(#trailCore)" />
+                    <line x1="30" y1="4" x2="30" y2="258" stroke="#ffffff" strokeWidth="0.6" strokeLinecap="round" opacity="0.55" />
+                    <circle cx="30" cy="256" r="10" fill="url(#headCap)" filter="url(#headCapBlur)" />
+                    <circle cx="30" cy="256" r="3" fill="#ffffff" opacity="0.9" />
                   </svg>
                 </motion.div>
               </motion.div>
@@ -403,6 +388,7 @@ export function Projects() {
               {roadmapProjects.map((project, i) => (
                 <RoadmapItem key={project.id} project={project} index={i} onOpen={setSelectedProject} />
               ))}
+              <ExploreMoreCard onVisible={(v) => setStarHidden(v)} />
             </div>
           </div>
         </div>

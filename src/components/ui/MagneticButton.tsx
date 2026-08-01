@@ -33,15 +33,20 @@ export function MagneticButton({
   };
 
   return (
-    <motion.div
+    <div
       ref={ref}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      style={{ x: springX, y: springY }}
-      className={`inline-block ${className}`}
-      whileTap={{ scale: 0.95 }}
+      className={`inline-block relative ${className}`}
+      // Expand pointer hit area so clicks register even when child is magnetically offset
+      style={{ padding: "12px", margin: "-12px" }}
     >
-      {children}
-    </motion.div>
+      <motion.div
+        style={{ x: springX, y: springY }}
+        whileTap={{ scale: 0.95 }}
+      >
+        {children}
+      </motion.div>
+    </div>
   );
 }

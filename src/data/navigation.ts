@@ -17,7 +17,7 @@ export interface SocialLink {
 }
 
 export const socialLinks: SocialLink[] = [
-  { label: "GitHub", href: "https://github.com/RiteshKrChauhan", icon: "github" },
-  { label: "LinkedIn", href: "https://linkedin.com/in/riteshkumarchauhan", icon: "linkedin" },
   { label: "Email", href: "mailto:riteshkumarchauhan9@gmail.com", icon: "mail" },
+  { label: "LinkedIn", href: "https://linkedin.com/in/riteshkumarchauhan", icon: "linkedin" },
+  { label: "GitHub", href: "https://github.com/RiteshKrChauhan", icon: "github" },
 ];

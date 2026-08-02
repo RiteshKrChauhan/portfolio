@@ -6,7 +6,6 @@ import { navigationItems } from "@/data";
 import { useReducedMotion } from "@/hooks";
 import { MagneticButton } from "@/components/ui/MagneticButton";
 import { cn } from "@/lib/utils";
-import { getLenis } from "@/lib/smooth-scroll";
 
 export function Navbar() {
   const [activeSection, setActiveSection] = useState("");
@@ -38,17 +37,9 @@ export function Navbar() {
   const handleNavClick = (href: string) => {
     setMobileOpen(false);
     const id = href.slice(1);
-    const lenis = getLenis();
-    if (lenis) {
-      lenis.scrollTo(`#${id}`, {
-        duration: prefersReduced ? 0 : 1.2,
-        offset: -80,
-      });
-    } else {
-      document.getElementById(id)?.scrollIntoView({
-        behavior: prefersReduced ? "auto" : "smooth",
-      });
-    }
+    document.getElementById(id)?.scrollIntoView({
+      behavior: prefersReduced ? "auto" : "smooth",
+    });
   };
 
   return (

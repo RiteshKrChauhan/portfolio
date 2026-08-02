@@ -8,6 +8,7 @@ interface RevealCharsProps {
   as?: "h1" | "h2" | "h3" | "p" | "span";
   delay?: number;
   stagger?: number;
+  fast?: boolean;
 }
 
 export function RevealChars({
@@ -16,6 +17,7 @@ export function RevealChars({
   as: Tag = "span",
   delay = 0,
   stagger = 0.02,
+  fast = false,
 }: RevealCharsProps) {
   return (
     <Tag className={className}>
@@ -25,10 +27,10 @@ export function RevealChars({
           className="inline-block"
           initial={{ opacity: 0, y: 20, rotateX: -90 }}
           whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-          viewport={{ once: true, margin: "-50px" }}
+          viewport={{ once: false, margin: "-50px" }}
           transition={{
-            duration: 0.5,
-            delay: delay + i * stagger,
+            duration: fast ? 0.2 : 0.5,
+            delay: (fast ? 0 : delay) + i * (fast ? 0.01 : stagger),
             ease: [0.25, 0.46, 0.45, 0.94],
           }}
         >

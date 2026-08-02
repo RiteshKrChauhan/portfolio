@@ -68,11 +68,11 @@ export function About() {
           label="About"
           title="Crafting digital experiences"
         />
-        <div className="grid lg:grid-cols-2 gap-0 items-center">
+        <div className="grid lg:grid-cols-[minmax(0,320px)_1fr] gap-8 lg:gap-12 items-center">
           {/* Image / Avatar panel */}
           <motion.div
             ref={imageRef}
-            className="relative aspect-[4/5] max-w-xs mx-auto lg:mx-0 rounded-3xl overflow-hidden cursor-none"
+            className="relative aspect-[4/5] w-full max-w-xs mx-auto rounded-3xl overflow-hidden cursor-none"
             style={prefersReduced ? {} : { rotateX, rotateY, transformStyle: "preserve-3d" }}
             onMouseMove={handleMouseMove}
             onMouseLeave={() => { mouseX.set(0.5); mouseY.set(0.5); }}
@@ -84,9 +84,11 @@ export function About() {
             <div className="absolute inset-0 bg-gradient-to-br from-[#060810] via-[#0a0f1e] to-[#060810]" />
             <div className="absolute inset-0 bg-gradient-to-tr from-sky-500/[0.06] via-transparent to-blue-500/[0.06]" />
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-7xl font-bold text-gradient-space opacity-15 select-none">
-                {siteConfig.name.split(" ").map(n => n[0]).join("")}
-              </span>
+              <img
+                src="/images/Ritesh.jpeg"
+                alt={siteConfig.name}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
             </div>
             <motion.div
               className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-500 pointer-events-none"

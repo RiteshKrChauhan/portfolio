@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
-import { GitBranch, X, ArrowUpRight } from "lucide-react";
+import { GitBranch, X, ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 
 function GitHubIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z" fill="white"/>
+      <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z" fill="white" />
     </svg>
   );
 }
@@ -47,12 +48,14 @@ function ProjectCard({ project, index, onOpen }: { project: Project; index: numb
     >
       <motion.div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-[1]" style={{ background: glowBg }} />
       <div className="relative h-52 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-sky-500/[0.07] via-blue-500/[0.05] to-indigo-500/[0.07] group-hover:scale-105 transition-transform duration-700" />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-5xl opacity-[0.06] group-hover:opacity-[0.12] transition-opacity select-none font-bold text-white">
-            {project.title.slice(0, 2).toUpperCase()}
-          </span>
-        </div>
+        <Image
+          src={project.thumbnail}
+          alt={project.title}
+          fill
+          className="object-cover group-hover:scale-105 transition-transform duration-700"
+          sizes="(max-width: 768px) 100vw, 50vw"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-sky-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         {project.featured && (
           <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-sky-500/10 border border-sky-500/20 text-sky-400 backdrop-blur-sm">
@@ -106,15 +109,15 @@ function RoadmapItem({ project, index, onOpen }: { project: Project; index: numb
           opacity: lineOpacity,
           ...(isLeft
             ? {
-                left: "calc(50% - 64px)",
-                width: "64px",
-                background: "linear-gradient(to right, rgba(186,230,253,0.9) 0%, rgba(125,211,252,0.55) 50%, transparent 100%)",
-              }
+              left: "calc(50% - 64px)",
+              width: "64px",
+              background: "linear-gradient(to right, rgba(186,230,253,0.9) 0%, rgba(125,211,252,0.55) 50%, transparent 100%)",
+            }
             : {
-                left: "50%",
-                width: "64px",
-                background: "linear-gradient(to left, rgba(186,230,253,0.9) 0%, rgba(125,211,252,0.55) 50%, transparent 100%)",
-              }),
+              left: "50%",
+              width: "64px",
+              background: "linear-gradient(to left, rgba(186,230,253,0.9) 0%, rgba(125,211,252,0.55) 50%, transparent 100%)",
+            }),
         }}
       />
 
@@ -193,11 +196,174 @@ function ExploreMoreCard({ onVisible }: { onVisible: (visible: boolean) => void 
   );
 }
 
+const OFFSET_X = 18;
+const SCALE_STEP = 0.04;
+
+function ImageCarousel({ images }: { images: string[] }) {
+  const [current, setCurrent] = useState(0);
+  const [prev, setPrev] = useState<number | null>(null);
+  const [dir, setDir] = useState<"next" | "prev">("next");
+  const busy = useRef(false);
+
+  const go = useCallback((target: number) => {
+    const clamped = Math.max(0, Math.min(images.length - 1, target));
+    if (clamped === current || busy.current) return;
+    busy.current = true;
+    setDir(clamped > current ? "next" : "prev");
+    setPrev(current);
+    setCurrent(clamped);
+    setTimeout(() => {
+      setPrev(null);
+      busy.current = false;
+    }, 420);
+  }, [current, images.length]);
+
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") go(current - 1);
+      if (e.key === "ArrowRight") go(current + 1);
+    };
+    window.addEventListener("keydown", h);
+    return () => window.removeEventListener("keydown", h);
+  }, [go, current]);
+
+  const remaining = images.length - 1 - current;
+  const backCount = remaining;
+  const backIndices = Array.from({ length: backCount }, (_, i) => current + 1 + i);
+
+  return (
+    <div className="mb-8">
+      {/* Outer row: [prev] [stack] [next] */}
+      <div className="flex items-center gap-3">
+
+        {/* Prev button — left of entire stack */}
+        {images.length > 1 && (
+          <button
+            onClick={() => go(current - 1)}
+            disabled={current === 0}
+            className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center bg-white/[0.06] hover:bg-white/[0.10] border border-white/[0.10] backdrop-blur-sm transition-all duration-200 disabled:opacity-20 disabled:cursor-not-allowed"
+            type="button"
+            aria-label="Previous"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+        )}
+
+        {/* Stack container */}
+        <div className="relative flex-1" style={{ paddingRight: backCount * OFFSET_X }}>
+
+          {/* Back-layer silhouettes */}
+          {[...backIndices].reverse().map((_, revI) => {
+            const depth = backIndices.length - revI;
+            return (
+              <div
+                key={depth}
+                className="absolute inset-0 rounded-2xl bg-[#0d1017] border border-white/[0.06]"
+                style={{
+                  transform: `translateX(${depth * OFFSET_X}px) scaleX(${1 - depth * SCALE_STEP})`,
+                  transformOrigin: "top left",
+                  zIndex: depth,
+                  transition: "transform 0.38s cubic-bezier(0.22,1,0.36,1)",
+                }}
+              />
+            );
+          })}
+
+          {/* Outgoing card */}
+          {prev !== null && (
+            <div
+              className="absolute inset-0 rounded-2xl overflow-hidden border border-white/[0.10] bg-[#0d1017]"
+              style={{
+                zIndex: backCount + 2,
+                animation: dir === "next"
+                  ? "card-exit-left 0.38s cubic-bezier(0.4,0,1,1) forwards"
+                  : "card-exit-right 0.38s cubic-bezier(0.4,0,1,1) forwards",
+              }}
+            >
+              <div className="relative w-full" style={{ aspectRatio: "16/9" }}>
+                <Image src={images[prev]} alt="" fill className="object-contain" sizes="768px" />
+              </div>
+            </div>
+          )}
+
+          {/* Current card — no buttons inside */}
+          <div
+            key={current}
+            className="relative rounded-2xl overflow-hidden border border-white/[0.14] bg-[#0d1017]"
+            style={{
+              zIndex: backCount + 1,
+              animation: prev !== null
+                ? (dir === "next"
+                  ? "card-enter-next 0.42s cubic-bezier(0.22,1,0.36,1) forwards"
+                  : "card-enter-prev 0.42s cubic-bezier(0.22,1,0.36,1) forwards")
+                : "none",
+            }}
+          >
+            <div className="relative w-full" style={{ aspectRatio: "16/9" }}>
+              <Image src={images[current]} alt={`Screenshot ${current + 1}`} fill className="object-contain" sizes="768px" />
+            </div>
+          </div>
+        </div>
+
+        {/* Next button — right of entire stack */}
+        {images.length > 1 && (
+          <button
+            onClick={() => go(current + 1)}
+            disabled={current === images.length - 1}
+            className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center bg-white/[0.06] hover:bg-white/[0.10] border border-white/[0.10] backdrop-blur-sm transition-all duration-200 disabled:opacity-20 disabled:cursor-not-allowed"
+            type="button"
+            aria-label="Next"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        )}
+
+      </div>
+
+      {images.length > 1 && (
+        <div className="flex justify-center gap-1.5 mt-3">
+          {images.map((_, i) => (
+            <button key={i} onClick={() => go(i)}
+              className={`h-1 rounded-full transition-all duration-300 ${i === current ? "w-5 bg-white" : "w-1.5 bg-white/30 hover:bg-white/60"
+                }`}
+              type="button" aria-label={`Go to image ${i + 1}`}
+            />
+          ))}
+        </div>
+      )}
+
+      <style>{`
+        @keyframes card-exit-left {
+          from { transform: translateX(0px);    opacity: 1; }
+          to   { transform: translateX(-100px); opacity: 0; }
+        }
+        @keyframes card-exit-right {
+          from { transform: translateX(0px);   opacity: 1; }
+          to   { transform: translateX(100px); opacity: 0; }
+        }
+        @keyframes card-enter-next {
+          from { transform: translateX(60px); opacity: 0; }
+          to   { transform: translateX(0px);  opacity: 1; }
+        }
+        @keyframes card-enter-prev {
+          from { transform: translateX(-60px); opacity: 0; }
+          to   { transform: translateX(0px);   opacity: 1; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 function ProjectModal({ project, onClose }: { project: Project; onClose: () => void }) {
   useEffect(() => {
     const lenis = getLenis();
     lenis?.stop();
-    return () => { lenis?.start(); };
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      lenis?.start();
+      document.body.style.overflow = prev;
+    };
   }, []);
 
   if (typeof document === "undefined") return null;
@@ -206,7 +372,7 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
     <motion.div className="fixed inset-0 z-[1000] flex items-center justify-center p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
       <motion.div className="absolute inset-0 bg-black/80 backdrop-blur-md" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />
       <motion.div
-        className="relative w-full max-w-3xl max-h-[90vh] overflow-hidden rounded-3xl glass border border-white/[0.08]"
+        className="relative w-full max-w-3xl max-h-[90vh] rounded-3xl glass border border-white/[0.08] overflow-hidden"
         initial={{ opacity: 0, scale: 0.92, y: 40 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.92, y: 40 }}
@@ -216,13 +382,8 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
         <button onClick={onClose} className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full flex items-center justify-center bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.1] backdrop-blur-md transition-colors" aria-label="Close" type="button">
           <X className="w-4 h-4" />
         </button>
-        <div className="max-h-[90vh] overflow-y-auto p-8" data-lenis-prevent>
-          <div className="relative h-56 rounded-2xl overflow-hidden mb-6">
-            <div className="absolute inset-0 bg-gradient-to-br from-sky-500/10 via-blue-500/[0.07] to-indigo-500/10" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-6xl font-bold opacity-[0.05] text-white">{project.title.slice(0, 2).toUpperCase()}</span>
-            </div>
-          </div>
+        <div className="max-h-[90vh] overflow-y-auto p-8" style={{ overscrollBehavior: "contain" }} data-lenis-prevent>
+          <ImageCarousel images={project.images} />
           <h2 className="text-3xl font-bold mb-3 text-gradient-space">{project.title}</h2>
           <p className="text-zinc-400 leading-relaxed mb-6">{project.longDescription}</p>
           {project.architecture && (
@@ -348,28 +509,28 @@ export function Projects() {
                   >
                     <defs>
                       <linearGradient id="trailCore" x1="0" y1="1" x2="0" y2="0">
-                        <stop offset="0%"   stopColor="#ffffff"  stopOpacity="1"    />
-                        <stop offset="8%"   stopColor="#ffffff"  stopOpacity="0.95" />
-                        <stop offset="20%"  stopColor="#e0f2fe"  stopOpacity="0.65" />
-                        <stop offset="55%"  stopColor="#7dd3fc"  stopOpacity="0.28" />
-                        <stop offset="100%" stopColor="#0369a1"  stopOpacity="0"    />
+                        <stop offset="0%" stopColor="#ffffff" stopOpacity="1" />
+                        <stop offset="8%" stopColor="#ffffff" stopOpacity="0.95" />
+                        <stop offset="20%" stopColor="#e0f2fe" stopOpacity="0.65" />
+                        <stop offset="55%" stopColor="#7dd3fc" stopOpacity="0.28" />
+                        <stop offset="100%" stopColor="#0369a1" stopOpacity="0" />
                       </linearGradient>
                       <linearGradient id="trailGlow" x1="0" y1="1" x2="0" y2="0">
-                        <stop offset="0%"   stopColor="#ffffff"  stopOpacity="0.5"  />
-                        <stop offset="8%"   stopColor="#bae6fd"  stopOpacity="0.38" />
-                        <stop offset="45%"  stopColor="#38bdf8"  stopOpacity="0.14" />
-                        <stop offset="100%" stopColor="#0284c7"  stopOpacity="0"    />
+                        <stop offset="0%" stopColor="#ffffff" stopOpacity="0.5" />
+                        <stop offset="8%" stopColor="#bae6fd" stopOpacity="0.38" />
+                        <stop offset="45%" stopColor="#38bdf8" stopOpacity="0.14" />
+                        <stop offset="100%" stopColor="#0284c7" stopOpacity="0" />
                       </linearGradient>
                       <linearGradient id="trailHalo" x1="0" y1="1" x2="0" y2="0">
-                        <stop offset="0%"   stopColor="#7dd3fc"  stopOpacity="0.18" />
-                        <stop offset="55%"  stopColor="#0ea5e9"  stopOpacity="0.05" />
-                        <stop offset="100%" stopColor="#0c4a6e"  stopOpacity="0"    />
+                        <stop offset="0%" stopColor="#7dd3fc" stopOpacity="0.18" />
+                        <stop offset="55%" stopColor="#0ea5e9" stopOpacity="0.05" />
+                        <stop offset="100%" stopColor="#0c4a6e" stopOpacity="0" />
                       </linearGradient>
                       <radialGradient id="headCap" cx="50%" cy="50%" r="50%">
-                        <stop offset="0%"   stopColor="#ffffff"  stopOpacity="0.95" />
-                        <stop offset="35%"  stopColor="#e0f2fe"  stopOpacity="0.7"  />
-                        <stop offset="70%"  stopColor="#7dd3fc"  stopOpacity="0.3"  />
-                        <stop offset="100%" stopColor="#0369a1"  stopOpacity="0"    />
+                        <stop offset="0%" stopColor="#ffffff" stopOpacity="0.95" />
+                        <stop offset="35%" stopColor="#e0f2fe" stopOpacity="0.7" />
+                        <stop offset="70%" stopColor="#7dd3fc" stopOpacity="0.3" />
+                        <stop offset="100%" stopColor="#0369a1" stopOpacity="0" />
                       </radialGradient>
                       <filter id="trailBlur" x="-300%" y="-5%" width="700%" height="110%">
                         <feGaussianBlur stdDeviation="4.5" />
